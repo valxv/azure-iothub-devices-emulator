@@ -27,12 +27,12 @@ namespace AzureIotHubDevicesEmulator.Messages
         {
             Dictionary<double, string> distribution = new Dictionary<double, string>
             {
-                { messageDistribution.Alarm, MessageTypes.Alarm },
+                { 0, MessageTypes.Alarm },
                 { messageDistribution.Event, MessageTypes.Event },
                 { messageDistribution.TimeSeries, MessageTypes.TimeSeries }
             };
 
-            return distribution.OrderByDescending(kv => kv.Key).First(kv => kv.Key < randomValue).Value;
+            return distribution.OrderByDescending(kv => kv.Key).First(kv => kv.Key <= randomValue).Value;
         }
     }
 }

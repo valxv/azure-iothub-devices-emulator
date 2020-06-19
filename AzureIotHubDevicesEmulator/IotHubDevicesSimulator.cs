@@ -46,8 +46,10 @@ namespace AzureIotHubDevicesEmulator
                 foreach (var deviceInfo in tenant.Value)
                 {
                     runningTasks.Add(
-                        // run independent threads per device in parallel
-                        Task.Run(() => StartSendingMessagesForDeviceAsync(tenant.Key, deviceInfo, cancellationToken)));
+                        Task.Factory.StartNew(
+                            () => StartSendingMessagesForDeviceAsync(tenant.Key, deviceInfo, cancellationToken),
+                            TaskCreationOptions.LongRunning)
+                        );
                 }
             }
 
