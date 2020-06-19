@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureIotHubDevicesEmulator", "AzureIotHubDevicesEmulator\AzureIotHubDevicesEmulator.csproj", "{D319546A-0027-4E2C-A3F1-868829ED2800}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D319546A-0027-4E2C-A3F1-868829ED2800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D319546A-0027-4E2C-A3F1-868829ED2800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D319546A-0027-4E2C-A3F1-868829ED2800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D319546A-0027-4E2C-A3F1-868829ED2800}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {840152F2-44C3-43C0-A876-1C64F4F172FE}
+	EndGlobalSection
+EndGlobal
