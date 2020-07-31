@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureIotHubDevicesEmulator", "AzureIotHubDevicesEmulator\AzureIotHubDevicesEmulator.csproj", "{D319546A-0027-4E2C-A3F1-868829ED2800}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureIotHubDevicesEmulator", "AzureIotHubDevicesEmulator\AzureIotHubDevicesEmulator.csproj", "{D319546A-0027-4E2C-A3F1-868829ED2800}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D4D2483-5377-49B5-A077-97A9112E5387}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
