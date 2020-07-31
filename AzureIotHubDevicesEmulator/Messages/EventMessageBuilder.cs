@@ -14,6 +14,7 @@ namespace AzureIotHubDevicesEmulator.Messages
                 JsonSerializer.SerializeToUtf8Bytes(
                     new EventMessage
                     {
+                        MessageType = "event",
                         TenantId = tenantId,
                         ObjectId = objectId,
                         Model = "abb.ability.device",

@@ -37,7 +37,6 @@ namespace AzureIotHubDevicesEmulator
             await Initialize().ConfigureAwait(false);
 
             _logger.LogInformation("Start sending telemetry messages...");
-            _logger.LogInformation("Press ENTER to stop the program...");
 
             List<Task> runningTasks = new List<Task>();
             foreach (var tenant in _tenantDeviceClients)
@@ -121,41 +120,72 @@ namespace AzureIotHubDevicesEmulator
 
             var poolFilePath = _configuration["ObjectIdsPoolFilePath"];
 
-            _objectIdsPool = new ObjectIdsPool() { Tenants = new List<Tenant>() };
+            if (await TryLoadExistingPoolFromFileAsync(poolFilePath).ConfigureAwait(false))
+                return;
 
-            if (File.Exists(poolFilePath))
+            _logger.LogInformation("ObjectId pool doesn't exist. Creating a new one...");
+
+            _objectIdsPool = new ObjectIdsPool { Tenants = new List<Tenant>() };
+
+            foreach (var tenant in _tenantDeviceClients)
             {
-                _logger.LogInformation("ObjectId pool exists. Reading...");
-                using var readStream = new FileStream(poolFilePath, FileMode.Open);
-                _objectIdsPool = await JsonSerializer.DeserializeAsync<ObjectIdsPool>(readStream).ConfigureAwait(false);
-            }
-            else
-            {
-                _logger.LogInformation("ObjectId pool doesn't exist. Creating a new one...");
-                foreach (var tenant in _tenantDeviceClients)
+                var tnt = new Tenant
                 {
-                    var tnt = new Tenant
-                    {
-                        Id = tenant.Key.Id,
-                        Devices = new List<TenantDevice>()
-                    };
+                    Id = tenant.Key.Id,
+                    Devices = new List<TenantDevice>()
+                };
 
-                    foreach (var deviceClient in tenant.Value)
+                foreach (var deviceClient in tenant.Value)
+                {
+                    tnt.Devices.Add(new TenantDevice
                     {
-                        tnt.Devices.Add(new TenantDevice
-                        {
-                            DeviceId = deviceClient.DeviceId,
-                            ObjectId = Guid.NewGuid()
-                        });
-                    }
-
-                    _objectIdsPool.Tenants.Add(tnt);
+                        DeviceId = deviceClient.DeviceId,
+                        ObjectId = Guid.NewGuid()
+                    });
                 }
 
-                using var writeStream = new FileStream(poolFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-                await JsonSerializer.SerializeAsync(writeStream, _objectIdsPool).ConfigureAwait(false);
+                _objectIdsPool.Tenants.Add(tnt);
             }
+
+            using var writeStream = new FileStream(poolFilePath, FileMode.Create, FileAccess.Write);
+            await JsonSerializer.SerializeAsync(writeStream, _objectIdsPool).ConfigureAwait(false);
+
             _logger.LogInformation("Device objectId pool successfully set up.");
+        }
+
+        private async Task<bool> TryLoadExistingPoolFromFileAsync(string poolFilePath)
+        {
+            if (!File.Exists(poolFilePath))
+                return false;
+
+            _logger.LogInformation("ObjectId pool exists. Reading...");
+
+            using var readStream = new FileStream(poolFilePath, FileMode.Open);
+            _objectIdsPool = await JsonSerializer.DeserializeAsync<ObjectIdsPool>(readStream).ConfigureAwait(false);
+
+            if (_tenantDeviceClients.Count != _objectIdsPool.Tenants.Count)
+            {
+                _objectIdsPool = null;
+                return false;
+            }
+
+            foreach (var tenant in _tenantDeviceClients)
+            {
+                var poolTenant = _objectIdsPool.Tenants.FirstOrDefault(t => t.Id == tenant.Key.Id);
+                if (poolTenant == null)
+                {
+                    _objectIdsPool = null;
+                    return false;
+                }
+
+                if (poolTenant.Devices.Count != tenant.Value.Count)
+                {
+                    _objectIdsPool = null;
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private async Task StartSendingMessagesForDeviceAsync(TenantConfiguration tenantConfiguration,
@@ -172,8 +202,15 @@ namespace AzureIotHubDevicesEmulator
 
                 var message = _messageFactory.CreateMessage(tenantConfiguration, deviceInfo.DeviceId, objectId, random);
 
-                await deviceInfo.DeviceClient.SendEventAsync(message, cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation($"Message for Tenant \"{tenantConfiguration.Id}\" DeviceId \"{deviceInfo.DeviceId}\" ObjectId \"{objectId}\" sent.");
+                try
+                {
+                    await deviceInfo.DeviceClient.SendEventAsync(message, cancellationToken).ConfigureAwait(false);
+                    _logger.LogInformation($"Message for Tenant \"{tenantConfiguration.Id}\" DeviceId \"{deviceInfo.DeviceId}\" ObjectId \"{objectId}\" sent.");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Device: {deviceInfo.DeviceId}; Error sending device message: {ex.Message}");
+                }
 
                 await Task.Delay(tenantConfiguration.SendingInterval, cancellationToken).ConfigureAwait(false);
             }

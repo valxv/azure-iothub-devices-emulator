@@ -14,6 +14,7 @@ namespace AzureIotHubDevicesEmulator.Messages
                 JsonSerializer.SerializeToUtf8Bytes(
                     new TimeSeriesMessage
                     {
+                        MessageType = "timeseries",
                         TenantId = tenantId,
                         ObjectId = objectId,
                         Model = "abb.ability.device",

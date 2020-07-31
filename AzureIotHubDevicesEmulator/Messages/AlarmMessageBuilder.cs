@@ -12,6 +12,7 @@ namespace AzureIotHubDevicesEmulator.Messages
                 JsonSerializer.SerializeToUtf8Bytes(
                     new AlarmMessage
                     {
+                        MessageType = "alarm",
                         TenantId = tenantId,
                         ObjectId = objectId,
                         Model = "abb.ability.device",

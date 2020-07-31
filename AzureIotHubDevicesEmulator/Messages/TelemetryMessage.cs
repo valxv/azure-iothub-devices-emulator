@@ -4,6 +4,7 @@ namespace AzureIotHubDevicesEmulator.Messages
 {
     public abstract class TelemetryMessage
     {
+        public string MessageType { get; set; }
         public string TenantId { get; set; }
         public string Model { get; set; }
         public Guid ObjectId { get; set; }

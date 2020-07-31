@@ -44,15 +44,24 @@ namespace AzureIotHubDevicesEmulator
 
         private async Task StartSendingTelemetryAsync()
         {
+            var exitEvent = new ManualResetEvent(false);
             var ctSource = new CancellationTokenSource();
-            var workingTask = Task.Run(() => _devicesSimulator.StartSendingMessagesAsync(ctSource.Token), ctSource.Token);
 
-            Console.ReadLine();
-            ctSource.Cancel();
+            Console.CancelKeyPress += (sender, eventArgs) => {
+                ctSource.Cancel();
+                eventArgs.Cancel = true;
+                exitEvent.Set();
+            };
 
-            _logger.LogInformation("Program exit requested! Finishing active threads...");
+            var workerTask = Task.Run(() => _devicesSimulator.StartSendingMessagesAsync(ctSource.Token), ctSource.Token);
 
-            await Task.WhenAny(workingTask, Task.Delay(5000)).ConfigureAwait(false);
+            exitEvent.WaitOne();
+
+            _logger.LogInformation("Program cancellation requested! Finishing active threads...");
+
+            await Task.WhenAny(workerTask, Task.Delay(5000)).ConfigureAwait(false);
+
+            _logger.LogInformation("All working threads stopped. Exiting...");
         }
 
         protected virtual void Dispose(bool disposing)

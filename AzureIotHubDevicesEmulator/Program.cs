@@ -38,7 +38,7 @@ namespace AzureIotHubDevicesEmulator
                 .AddSingleton<ISimulation, Simulation>()
                 .AddSingleton<IIotHubRegistryManager, IotHubRegistryManager>()
                 .AddSingleton<IIotHubDevicesSimulator, IotHubDevicesSimulator>()
-                .AddSingleton<IMessageFactory>(sp => new MessageFactory(
+                .AddSingleton<IMessageFactory>(_ => new MessageFactory(
                     new Dictionary<string, IMessageBuilder>()
                     {
                         { MessageTypes.Alarm, new AlarmMessageBuilder() },
