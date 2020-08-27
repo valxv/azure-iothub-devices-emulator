@@ -1,8 +1,10 @@
-﻿namespace AzureIotHubDevicesEmulator.Messages
+﻿using System.Text.Json;
+
+namespace AzureIotHubDevicesEmulator.Messages
 {
     public class TimeSeriesMessage : TelemetryMessage
     {
         public string Variable { get; set; }
-        public double Value { get; set; }
+        public dynamic Value { get; set; }
     }
 }

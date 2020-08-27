@@ -20,7 +20,7 @@ namespace AzureIotHubDevicesEmulator.Messages
                         Model = "abb.ability.device",
                         Timestamp = DateTime.UtcNow.ToString("o"),
                         Variable = "temperature",
-                        Value = Math.Round(_random.NextDouble() * 10 + 20, 1)
+                        Value = new { Prop1 = new { Prop2 = Math.Round(_random.NextDouble() * 10 + 20, 1) } }
                     },
                     new JsonSerializerOptions
                     {

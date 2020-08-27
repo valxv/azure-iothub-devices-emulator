@@ -66,14 +66,20 @@ namespace AzureIotHubDevicesEmulator
                                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                             }));
 
-                await _registryManager.RemoveDevices2Async(json.Select(j =>
+                foreach (var deviceId in json.Select(j => j.GetProperty("deviceId").GetString()))
                 {
+                    await _registryManager.RemoveDeviceAsync(deviceId);
                     count++;
-                    return new Device(j.GetProperty("deviceId").GetString())
-                    {
-                        ETag = j.GetProperty("etag").GetString()
-                    };
-                })).ConfigureAwait(false);
+                }
+
+                //await _registryManager.RemoveDevices2Async(json.Select(j =>
+                //{
+                //    count++;
+                //    return new Device(j.GetProperty("deviceId").GetString())
+                //    {
+                //        ETag = j.GetProperty("etag").GetString()
+                //    };
+                //})).ConfigureAwait(false);
             } while (query.HasMoreResults);
 
             if (File.Exists(_configuration["ObjectIdsPoolFilePath"]))
